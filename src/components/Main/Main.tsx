@@ -1,5 +1,11 @@
 import { Button, Divider, Stack, TextField, Typography } from "@mui/material";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 export default function Main() {
   console.log("component rendered");
@@ -8,6 +14,8 @@ export default function Main() {
   const [startDate, setStartDate] = useState<string>();
   const [milesPerDay, setMilesPerDay] = useState<number>();
   const [calculatedMileageByDays, setCalculatedMileageByDays] =
+    useState<number>();
+  const [recommendedMaxMilesByNow, setRecommendedMaxMilesByNow] =
     useState<number>();
   const [daysSinceLeaseStart, setDaysSinceLeaseStart] = useState<number>();
 
@@ -32,6 +40,13 @@ export default function Main() {
       setMilesPerDay(milesLimit / 365);
     }
   };
+
+  useEffect(() => {
+    if (currentMileage && daysSinceLeaseStart && milesPerDay) {
+      setCalculatedMileageByDays(currentMileage / daysSinceLeaseStart);
+      setRecommendedMaxMilesByNow(milesPerDay * daysSinceLeaseStart);
+    }
+  }, [daysSinceLeaseStart, currentMileage, milesPerDay]);
 
   return (
     <>
@@ -74,10 +89,30 @@ export default function Main() {
         justifyContent={"space-around"}
         width={"100%"}
         padding={"24px"}
-        sx={{ backgroundColor: "white", color: 'black' }}
+        sx={{ backgroundColor: "white", color: "black" }}
       >
-        <Typography variant="body1">Days since lease started: {daysSinceLeaseStart}</Typography>
-        <Typography variant="body1">Recommended miles per day (on average): {Math.floor(milesPerDay || 0)}</Typography>
+        <Typography variant="body1">
+          Days since lease started: {daysSinceLeaseStart}
+        </Typography>
+        <Typography variant="body1">
+          Recommended miles per day (on average): {Math.floor(milesPerDay || 0)}
+        </Typography>
+      </Stack>
+      <Stack
+        flexDirection={"row"}
+        justifyContent={"space-around"}
+        width={"100%"}
+        padding={"24px"}
+        sx={{ backgroundColor: "white", color: "black" }}
+      >
+        <Typography variant="body1">
+          Your mileage: {currentMileage}. If you used the recommended Miles per
+          day: {Math.floor(recommendedMaxMilesByNow || 0)}.
+        </Typography>
+        <Typography variant="body1">
+          Your mileage per day (on average):{" "}
+          {Math.floor(calculatedMileageByDays || 0)}
+        </Typography>
       </Stack>
     </>
   );
